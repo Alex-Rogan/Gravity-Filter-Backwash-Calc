@@ -1,0 +1,29 @@
+t=0 #time in seconds
+ftr_lvl=0 #moving filter height
+
+# Filter dimensions
+ftr_D=305/1000                    #filter diameter in meters
+ftr_A=3.14159*((ftr_D/2)**2)      #filter area
+ftr_S=3658/1000                   #filter sidewall height in meters
+ftr_head_min=ftr_S-1.524          # 12' tank - 5' (1.524 m) for oxygen to remain dissolved
+
+# influent source
+raw_flow=0.126                    # 2 usgpm in L/s
+raw=raw_flow*0.001                # 2 usgpm in m^3/s
+raw_height=raw/ftr_A              # flow / area to represent as height in meters per second
+
+# filtrate
+filtrate_flow=0.126               # 2 usgpm in L/s
+filtrate=filtrate_flow*0.001      # 2 usgpm in m^3/s
+filtrate_height=filtrate/ftr_A    # flow / area to represent as height in meters per second
+
+# head loss
+hl=(filtrate_height*0.002)+(7*(10**(-9))) #head loss in meters per second
+
+# ftr water head
+while (ftr_lvl < ftr_head_min) and (t < 100000):
+    ftr_lvl=ftr_lvl+raw_height-(filtrate_height-(hl*t))
+    t=t+1
+
+print("Conditions met after "+str(t)+" iterations.")
+print("Filter requires backwashing every "+str(round((t/60/60),2))+" hours.")
